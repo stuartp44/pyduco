@@ -1,4 +1,4 @@
-# Duco Air ppython library
+# Duco Air python library
 
 Allows you to be able to communicate with a Duco Air system. You must have installed the Duco e.g https://www.cvtotaal.nl/duco-communication-print-voor-ducobox-silent-focus-energy.html for this plugin to work.
 
