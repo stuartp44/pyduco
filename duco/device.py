@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 
 class DucoDevice:
     def __init__(self, address, port=80, protocol="http"):

@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "zeroconf",
-        "requests",
+        "aiohttp",
         "pytest"
     ],
     author="Stuart Pearson",
