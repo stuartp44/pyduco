@@ -8,7 +8,7 @@ I welcome any contributions to help improve this library, please open a issue an
 
 # Compatibility
 
-This plibrary will work with anything that uses the Duco communication and print as its way of communicating with standard TCP/IP networks. Example is DucoBox Silent connect or DucoBox Focus
+This library will work with anything that uses the Duco communication and print as its way of communicating with standard TCP/IP networks. Example is DucoBox Silent connect or DucoBox Focus
 
 # Please NOTE!
 
