@@ -24,7 +24,7 @@ class DucoDevice:
                 returned_data = response.text.strip()
                 return { "action_state": returned_data }
             # if the body contains json, return that ignoring the headers
-            elif response.headers['content-type'] == "application/json":
+            elif response.headers['content-type'] == "application/json; charset=UTF-8":
                 return response.json()
             else:
                 print(f"Unexpected content type: {response.headers['content-type']}")
