@@ -16,9 +16,12 @@ async def main():
     for device in devices:
         print(f"Name: {device['name']}, Address: {device['address']}, Port: {device['port']}, API Version: {device['api_version']}")
         duco_device = DucoDevice(address=device['address'], port=device['port'], api_version=device['api_version'])
-        if device['api_version'] == '1.0':
+        if device['api_version'] == 1.0:
             boardinfo = await duco_device.get_cap_board_info()
             print(f"Communication and Print Board Serial Number: {boardinfo['serial']}, Uptime: {boardinfo['uptime']}, Software Version: {boardinfo['swversion']}")
+        elif device['api_version'] == 2.2:
+            boardinfo = await duco_device.get_c_board_info()
+            print(f"Communication Board Serial Number: {boardinfo.get('General', {}).get('Board', {}).get('SerialBoardComm', {}).get('Val')}")
         nodelist = await duco_device.get_node_list()
         print(f"Node List: {nodelist}")
         for node in nodelist:

@@ -37,13 +37,31 @@ class DucoDevice:
 
     async def get_cap_board_info(self):
         """
-        Fetch the board information from the Duco device.
+        Fetch the communication and print board information from the Duco device.
 
         :return: A dictionary containing the board information, or None if the request fails.
         """
-        query_string = "board_info"
-        data = await self.fetch_json(query_string)
-        return data
+        if self.api_version == 1.0:
+            query_string = "board_info"
+            data = await self.fetch_json(query_string)
+            return data
+        else:
+            print(f"Unsupported API version: {self.api_version}")
+            raise NotImplementedError
+
+    async def get_c_board_info(self):
+        """
+        Fetch the communication board information from the Duco device.
+
+        :return: A dictionary containing the board information, or None if the request fails.
+        """
+        if self.api_version == 2.2:
+            query_string = "info"
+            data = await self.fetch_json(query_string)
+            return data
+        else:
+            print(f"Unsupported API version: {self.api_version}")
+            raise NotImplementedError
     
     async def get_node_list(self):
         """
