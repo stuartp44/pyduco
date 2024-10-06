@@ -1,10 +1,11 @@
 import aiohttp
 
 class DucoDevice:
-    def __init__(self, address, port=80, protocol="http"):
+    def __init__(self, address, port=80, protocol="http", api_version=1.0):
         self.address = address
         self.port = port
         self.protocol = protocol
+        self.api_version = api_version
 
     async def fetch_json(self, query_string):
         """
@@ -50,9 +51,20 @@ class DucoDevice:
 
         :return: A list of node IDs, or None if the request fails.
         """
-        query_string = "nodelist"
+        if self.api_version == 1.0:
+            query_string = "nodelist"
+        else:
+            query_string = "nodes"
         data = await self.fetch_json(query_string)
-        return data.get('nodelist', []) if data else []
+        if isinstance(data, list):
+            if all(isinstance(item, dict) and 'Node' in item for item in data):
+                data = [item['Node'] for item in data]
+            return data
+        elif isinstance(data, dict):
+            return data.get('nodelist', [])
+        else:
+            print("Unexpected data format")
+            return []
 
     async def get_node_info(self, node_id):
         """
@@ -60,9 +72,42 @@ class DucoDevice:
 
         :return: A dictionary containing the node information, or None if the request fails.
         """
-        query_string = f"nodeinfoget?node={node_id}"
+        if self.api_version == 1.0:
+            query_string = f"nodeinfoget?node={node_id}"
+        else:
+            query_string = f"info/nodes/{node_id}"
         data = await self.fetch_json(query_string)
-        return data if data else None
+        if self.api_version == 1.0:
+            return data
+        elif self.api_version == 2.2:
+            if isinstance(data, dict):
+                node_info = {
+                    "node": data.get("Node"),
+                    "devtype": data.get("General", {}).get("Type", {}).get("Val"),
+                    "subtype": data.get("General", {}).get("SubType", {}).get("Val"),
+                    "netw": data.get("General", {}).get("NetworkType", {}).get("Val"),
+                    "prnt": data.get("General", {}).get("Parent", {}).get("Val"),
+                    "asso": data.get("General", {}).get("Asso", {}).get("Val"),
+                    "location": data.get("General", {}).get("Name", {}).get("Val"),
+                    "identify": data.get("General", {}).get("Identify", {}).get("Val"),
+                    "ventilation_state": data.get("Ventilation", {}).get("State", {}).get("Val"),
+                    "ventilation_time_state_remain": data.get("Ventilation", {}).get("TimeStateRemain", {}).get("Val"),
+                    "ventilation_time_state_end": data.get("Ventilation", {}).get("TimeStateEnd", {}).get("Val"),
+                    "ventilation_mode": data.get("Ventilation", {}).get("Mode", {}).get("Val"),
+                    "ventilation_flow_lvl_tgt": data.get("Ventilation", {}).get("FlowLvlTgt", {}).get("Val"),
+                }
+                # Check if sensor information is available
+                sensor_data = data.get("Sensor", {})
+                for sensor_key, sensor_value in sensor_data.items():
+                    if isinstance(sensor_value, dict) and "Val" in sensor_value:
+                        node_info[sensor_key.lower()] = sensor_value["Val"]
+                return node_info
+            else:
+                print("Unexpected data format")
+            return None
+        else:
+            print(f"Unsupported API version: {self.api_version}")
+            return None
     
     async def get_node_attribute_value(self, node, attribute):
         """
